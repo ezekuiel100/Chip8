@@ -12,6 +12,8 @@ main :: proc() {
 		return
 	}
 
+	defer os.close(file)
+
 	info, info_ok := os.stat("test.txt")
 	if info_ok != nil {
 		fmt.println("Erro ao obter informações do arquivo:", info_ok)
