@@ -1,22 +1,32 @@
 package main
 
-import "core:os"
 import "core:fmt"
+import "core:os"
 
 
-main :: proc(){
-   file, err := os.open("test.txt")
+main :: proc() {
+	file, file_ok := os.open("test.txt")
 
-   if err != nil {
-      fmt.println("Erro ao abrir o arquivo:", err)
-        return
-   }
+	if file_ok != nil {
+		fmt.println("Erro ao abrir o arquivo:", file_ok)
+		return
+	}
 
-   info, _ := os.stat("test.txt")
-   size : = info.size
+	info, info_ok := os.stat("test.txt")
+	if info_ok != nil {
+		fmt.println("Erro ao obter informações do arquivo:", info_ok)
+		return
+	}
 
-    data := make([]u8 , size)
-    n , error := os.read_full(file, data)
-    fmt.println(string(data))
-   
+	size := info.size
+
+	data := make([]u8, size)
+	read, read_ok := os.read_full(file, data)
+	if read_ok != nil {
+		fmt.println("Erro ao ler o arquivo:", read_ok)
+		return
+	}
+
+	fmt.println("Bytes lidos:", read)
+	fmt.println(string(data))
 }
