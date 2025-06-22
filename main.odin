@@ -6,6 +6,7 @@ import "core:strings"
 
 
 main :: proc() {
+	position := 0
 	file, file_ok := os.open("teste.exe")
 
 	if file_ok != nil {
@@ -31,25 +32,15 @@ main :: proc() {
 		return
 	}
 
-	hex_output_builder: strings.Builder
-	strings.builder_init(&hex_output_builder)
-
-	for byte_value in data {
-		fmt.sbprint(&hex_output_builder, fmt.aprintf("%02X ", byte_value))
+	for bytes_value in data {
+		value := data[position:position + 2]
+		opcode := u16(value[0]) << 8 | u16(value[1])
+		chip8(opcode)
+		position = position + 2
 	}
-
-	hex_string := strings.to_string(hex_output_builder)
-
-	out_file, out_err := os.open("copia_teste.txt", os.O_WRONLY | os.O_CREATE | os.O_TRUNC, 0o644)
-	if out_err != nil {
-		fmt.println("Erro ao criar/abrir saída:", out_err)
-		return
-	}
-	defer os.close(out_file)
-
-	bytes_to_write := transmute([]u8)hex_string
-	write, write_ok := os.write(out_file, bytes_to_write)
+}
 
 
-	fmt.println("Arquivo criado com a representação hexadecimal.")
+chip8 :: proc(opcode: u16) {
+	fmt.printfln("0x%04X ", opcode)
 }
