@@ -2,11 +2,8 @@ package main
 
 import "core:fmt"
 import "core:os"
-import "core:strings"
-
 
 main :: proc() {
-	position := 0
 	file, file_ok := os.open("teste.exe")
 
 	if file_ok != nil {
@@ -32,9 +29,11 @@ main :: proc() {
 		return
 	}
 
-	for bytes_value in data {
+	position := 0
+	for position < len(data) {
 		value := data[position:position + 2]
 		opcode := u16(value[0]) << 8 | u16(value[1])
+
 		chip8(opcode)
 		position = position + 2
 	}
