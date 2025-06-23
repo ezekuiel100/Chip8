@@ -5,7 +5,15 @@ import "core:os"
 
 main :: proc() {
 	stack := [16]u16
-	sp := 0
+	sp : u8 = 0
+	pc :u16 // program counter , next address
+
+	//Registers
+	v :[16]u8
+	i :u16  // store memory address
+	dt: u8  //delay timer 
+	st :u8 //sound timer
+
 	
 	file, file_ok := os.open("MAZE")
 
@@ -51,6 +59,9 @@ chip8 :: proc(opcode: u16, stack: []u16 , sp: ^int) {
 				//Clear the display
 				fmt.printfln("0x%04x", opcode)
 			case 0x00ee:
+				//RET
+				sp = sp - 1
+				ret_addr := pop(stack)
 				fmt.printfln("0x%04x", opcode)
 			}
 	case 0x1000:
