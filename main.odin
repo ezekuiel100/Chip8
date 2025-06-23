@@ -45,13 +45,13 @@ main :: proc() {
 		value := data[position:position + 2]
 		opcode := u16(value[0]) << 8 | u16(value[1])
 
-		chip8(opcode, stack, &sp)
+		chip8(opcode, stack, &sp, &pc)
 		position = position + 2
 	}
 }
 
 
-chip8 :: proc(opcode: u16, stack: []u16 , sp: ^int) {
+chip8 :: proc(opcode: u16, stack: []u16 , sp: ^int, pc: ^u16) {
 	switch opcode & 0xf000 {
 	case 0x0000:
 		switch opcode & 0x0fff{
@@ -61,8 +61,8 @@ chip8 :: proc(opcode: u16, stack: []u16 , sp: ^int) {
 			case 0x00ee:
 				//RET
 				sp = sp - 1
-				ret_addr := pop(stack)
-				fmt.printfln("0x%04x", opcode)
+				ret_addr := stack[sp]
+				pc = ret_addr
 			}
 	case 0x1000:
 		fmt.printfln("0x%04x", opcode)
