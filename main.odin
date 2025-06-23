@@ -4,6 +4,9 @@ import "core:fmt"
 import "core:os"
 
 main :: proc() {
+	stack := [16]u16
+	sp := 0
+	
 	file, file_ok := os.open("MAZE")
 
 	if file_ok != nil {
@@ -34,17 +37,18 @@ main :: proc() {
 		value := data[position:position + 2]
 		opcode := u16(value[0]) << 8 | u16(value[1])
 
-		chip8(opcode)
+		chip8(opcode, stack, &sp)
 		position = position + 2
 	}
 }
 
 
-chip8 :: proc(opcode: u16) {
+chip8 :: proc(opcode: u16, stack: []u16 , sp: ^int) {
 	switch opcode & 0xf000 {
 	case 0x0000:
 		switch opcode & 0x0fff{
 			case 0x00e0:
+				//Clear the display
 				fmt.printfln("0x%04x", opcode)
 			case 0x00ee:
 				fmt.printfln("0x%04x", opcode)
