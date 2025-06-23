@@ -5,16 +5,16 @@ import "core:os"
 
 main :: proc() {
 	stack := [16]u16
-	sp : u8 = 0
-	pc :u16 // program counter , next address
+	sp: u8 = 0
+	pc: u16 // program counter , next address
 
 	//Registers
-	v :[16]u8
-	i :u16  // store memory address
-	dt: u8  //delay timer 
-	st :u8 //sound timer
+	v: [16]u8
+	i: u16 // store memory address
+	dt: u8 //delay timer 
+	st: u8 //sound timer
 
-	
+
 	file, file_ok := os.open("MAZE")
 
 	if file_ok != nil {
@@ -51,19 +51,19 @@ main :: proc() {
 }
 
 
-chip8 :: proc(opcode: u16, stack: []u16 , sp: ^int, pc: ^u16) {
+chip8 :: proc(opcode: u16, stack: []u16, sp: ^int, pc: ^u16) {
 	switch opcode & 0xf000 {
 	case 0x0000:
-		switch opcode & 0x0fff{
-			case 0x00e0:
-				//Clear the display
-				fmt.printfln("0x%04x", opcode)
-			case 0x00ee:
-				//RET
-				sp = sp - 1
-				ret_addr := stack[sp]
-				pc = ret_addr
-			}
+		switch opcode & 0x0fff {
+		case 0x00e0:
+			//Clear the display
+			fmt.printfln("0x%04x", opcode)
+		case 0x00ee:
+			//RET
+			sp = sp - 1
+			ret_addr := stack[sp]
+			pc = ret_addr
+		}
 	case 0x1000:
 		//Jump to location nnn.
 		location := opcode & 0x0fff
@@ -71,11 +71,16 @@ chip8 :: proc(opcode: u16, stack: []u16 , sp: ^int, pc: ^u16) {
 	case 0x2000:
 		//Call subroutine at nnn.
 		location := opcode & 0x0fff
-		stack[sp] = pc 		
+		stack[sp] = pc
 		sp = sp + 1
 		pc = location
-		case 0x3000:
-		fmt.printfln("0x%04x", opcode)
+	case 0x3000:
+		// Skip next instruction if Vx = kk.
+		x := (opcode & 0x0f00) >> 8
+		kk := opcode & 0x00ff
+		if v[x] == kk {
+			pc = pc + 4
+		}
 	case 0x4000:
 		fmt.printfln("0x%04x", opcode)
 	case 0x5000:
