@@ -4,7 +4,7 @@ import "core:fmt"
 import "core:os"
 
 main :: proc() {
-	file, file_ok := os.open("teste.exe")
+	file, file_ok := os.open("MAZE")
 
 	if file_ok != nil {
 		fmt.println("Erro ao abrir o arquivo:", file_ok)
@@ -13,7 +13,7 @@ main :: proc() {
 
 	defer os.close(file)
 
-	info, info_ok := os.stat("teste.exe")
+	info, info_ok := os.stat("MAZE")
 	if info_ok != nil {
 		fmt.println("Erro ao obter informações do arquivo:", info_ok)
 		return
@@ -41,40 +41,38 @@ main :: proc() {
 
 
 chip8 :: proc(opcode: u16) {
-	fmt.printfln("0x%04X ", opcode)
-
 	switch opcode & 0xF000 {
 	case 0x0000:
-		fmt.printfln(opcode)
+		fmt.printfln("0x%04x", opcode)
 	case 0x1000:
-		fmt.printfln(opcode)
+		fmt.printfln("0x%04x", opcode)
 	case 0x2000:
-		fmt.printfln(opcode)
+		fmt.printfln("0x%04x", opcode)
 	case 0x3000:
-		fmt.printfln(opcode)
+		fmt.printfln("0x%04x", opcode)
 	case 0x4000:
-		fmt.printfln(opcode)
+		fmt.printfln("0x%04x", opcode)
 	case 0x5000:
-		fmt.printfln(opcode)
+		fmt.printfln("0x%04x", opcode)
 	case 0x6000:
-		fmt.printfln(opcode)
+		fmt.printfln("0x%04x", opcode)
 	case 0x7000:
-		fmt.printfln(opcode)
+		fmt.printfln("0x%04x", opcode)
 	case 0x8000:
-		fmt.printfln(opcode)
+		fmt.printfln("0x%04x", opcode)
 	case 0x9000:
-		fmt.printfln(opcode)
+		fmt.printfln("0x%04x", opcode)
 	case 0xa000:
-		fmt.printfln(opcode)
+		fmt.printfln("0x%04x", opcode)
 	case 0xb000:
-		fmt.printfln(opcode)
+		fmt.printfln("0x%04x", opcode)
 	case 0xc000:
-		fmt.printfln(opcode)
+		fmt.printfln("0x%04x", opcode)
 	case 0xd000:
-		fmt.printfln(opcode)
+		fmt.printfln("0x%04x", opcode)
 	case 0xe000:
-		fmt.printfln(opcode)
+		fmt.printfln("0x%04x", opcode)
 	case 0xf000:
-		fmt.printfln(opcode)
+		fmt.printfln("0x%04x", opcode)
 	}
 }
