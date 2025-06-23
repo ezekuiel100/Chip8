@@ -41,9 +41,14 @@ main :: proc() {
 
 
 chip8 :: proc(opcode: u16) {
-	switch opcode & 0xF000 {
+	switch opcode & 0xf000 {
 	case 0x0000:
-		fmt.printfln("0x%04x", opcode)
+		switch opcode & 0x0fff{
+			case 0x00e0:
+				fmt.printfln("0x%04x", opcode)
+			case 0x00ee:
+				fmt.printfln("0x%04x", opcode)
+			}
 	case 0x1000:
 		fmt.printfln("0x%04x", opcode)
 	case 0x2000:
