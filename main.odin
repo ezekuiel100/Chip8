@@ -69,8 +69,12 @@ chip8 :: proc(opcode: u16, stack: []u16 , sp: ^int, pc: ^u16) {
 		location := opcode & 0x0fff
 		pc = location
 	case 0x2000:
-		fmt.printfln("0x%04x", opcode)
-	case 0x3000:
+		//Call subroutine at nnn.
+		location := opcode & 0x0fff
+		stack[sp] = pc 		
+		sp = sp + 1
+		pc = location
+		case 0x3000:
 		fmt.printfln("0x%04x", opcode)
 	case 0x4000:
 		fmt.printfln("0x%04x", opcode)
