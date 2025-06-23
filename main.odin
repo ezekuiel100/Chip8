@@ -65,7 +65,9 @@ chip8 :: proc(opcode: u16, stack: []u16 , sp: ^int, pc: ^u16) {
 				pc = ret_addr
 			}
 	case 0x1000:
-		fmt.printfln("0x%04x", opcode)
+		//Jump to location nnn.
+		location := opcode & 0x0fff
+		pc = location
 	case 0x2000:
 		fmt.printfln("0x%04x", opcode)
 	case 0x3000:
