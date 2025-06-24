@@ -116,6 +116,33 @@ chip8 :: proc(opcode: u16) {
 			y := (opcode & 0x00f0) >> 4
 
 			v[x] = v[y]
+		case 0x0001:
+			//Set Vx = Vx OR Vy.
+			x := (opcode & 0x0f00) >> 8
+			y := (opcode & 0x00f0) >> 4
+
+			v[x] = v[x] | v[y]
+		case 0x0002:
+		//Set Vx = Vx AND Vy.
+
+		case 0x0003:
+		//Set Vx = Vx XOR Vy.
+
+		case 0x0004:
+		//Set Vx = Vx + Vy, set VF = carry.
+
+		case 0x0005:
+		//Set Vx = Vx - Vy, set VF = NOT borrow.
+
+		case 0x0006:
+		//Set Vx = Vx SHR 1.
+
+		case 0x0007:
+		//Set Vx = Vy - Vx, set VF = NOT borrow.
+
+		case 0x000e:
+		//Set Vx = Vx SHL 1.
+
 		}
 	case 0x9000:
 		fmt.printfln("0x%04x", opcode)
