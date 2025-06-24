@@ -3,18 +3,17 @@ package main
 import "core:fmt"
 import "core:os"
 
+stack: [16]u16
+sp: u8 = 0
+pc: u16 // program counter , next address
+
+//Registers
+v: [16]u8
+i: u16 // store memory address
+dt: u8 //delay timer 
+st: u8 //sound timer
+
 main :: proc() {
-	stack := [16]u16
-	sp: u8 = 0
-	pc: u16 // program counter , next address
-
-	//Registers
-	v: [16]u8
-	i: u16 // store memory address
-	dt: u8 //delay timer 
-	st: u8 //sound timer
-
-
 	file, file_ok := os.open("MAZE")
 
 	if file_ok != nil {
@@ -45,13 +44,13 @@ main :: proc() {
 		value := data[position:position + 2]
 		opcode := u16(value[0]) << 8 | u16(value[1])
 
-		chip8(opcode, stack, &sp, &pc)
+		chip8(opcode)
 		position = position + 2
 	}
 }
 
 
-chip8 :: proc(opcode: u16, stack: []u16, sp: ^int, pc: ^u16) {
+chip8 :: proc(opcode: u16) {
 	switch opcode & 0xf000 {
 	case 0x0000:
 		switch opcode & 0x0fff {
@@ -78,7 +77,7 @@ chip8 :: proc(opcode: u16, stack: []u16, sp: ^int, pc: ^u16) {
 		// Skip next instruction if Vx = kk.
 		x := (opcode & 0x0f00) >> 8
 		kk := opcode & 0x00ff
-		if v[x] == kk {
+		if v[x] == u8(kk) {
 			pc = pc + 4
 		}
 	case 0x4000:
