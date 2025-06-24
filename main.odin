@@ -109,7 +109,14 @@ chip8 :: proc(opcode: u16) {
 
 		v[x] = v[x] + u8(kk)
 	case 0x8000:
-		fmt.printfln("0x%04x", opcode)
+		switch opcode & 0x000f {
+		case 0x0000:
+			//Set Vx = Vy.
+			x := (opcode & 0x0f00) >> 8
+			y := (opcode & 0x00f0) >> 4
+
+			v[x] = v[y]
+		}
 	case 0x9000:
 		fmt.printfln("0x%04x", opcode)
 	case 0xa000:
