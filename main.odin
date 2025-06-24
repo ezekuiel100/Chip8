@@ -129,8 +129,11 @@ chip8 :: proc(opcode: u16) {
 
 			v[x] = v[x] & v[y]
 		case 0x0003:
-		//Set Vx = Vx XOR Vy.
+			//Set Vx = Vx XOR Vy.
+			x := (opcode & 0x0f00) >> 8
+			y := (opcode & 0x00f0) >> 4
 
+			v[x] = v[x] ~ v[y]
 		case 0x0004:
 		//Set Vx = Vx + Vy, set VF = carry.
 
