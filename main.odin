@@ -97,9 +97,13 @@ chip8 :: proc(opcode: u16) {
 			pc = pc + 4
 		}
 	case 0x6000:
-		fmt.printfln("0x%04x", opcode)
+		//Set Vx = kk. Puts the value kk into register Vx.
+		x := (opcode & 0x0f00) >> 8
+		kk := opcode & 0x00ff
+
+		v[x] = u8(kk)
 	case 0x7000:
-		fmt.printfln("0x%04x", opcode)
+
 	case 0x8000:
 		fmt.printfln("0x%04x", opcode)
 	case 0x9000:
