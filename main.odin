@@ -171,7 +171,17 @@ chip8 :: proc(opcode: u16) {
 
 			v[x] = v[x] >> 1
 		case 0x0007:
-		//Set Vx = Vy - Vx, set VF = NOT borrow.
+			//Set Vx = Vy - Vx, set VF = NOT borrow. 
+			x := (opcode & 0x0f00) >> 8
+			y := (opcode & 0x00F0) >> 4
+
+			if v[y] > v[x] {
+				v[15] = 1
+			} else {
+				v[15] = 0
+			}
+
+			v[x] = u8(v[y] - v[x])
 
 		case 0x000e:
 		//Set Vx = Vx SHL 1.
