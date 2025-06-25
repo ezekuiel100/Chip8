@@ -184,8 +184,16 @@ chip8 :: proc(opcode: u16) {
 			v[x] = u8(v[y] - v[x])
 
 		case 0x000e:
-		//Set Vx = Vx SHL 1.
+			//Set Vx = Vx SHL 1.
+			x := (opcode & 0x0f00) >> 8
 
+			if (v[x] & 0x80) != 0 {
+				v[15] = 1
+			} else {
+				v[15] = 0
+			}
+
+			v[x] = v[x] << 1
 		}
 	case 0x9000:
 		fmt.printfln("0x%04x", opcode)
