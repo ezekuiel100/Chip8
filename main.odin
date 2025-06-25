@@ -148,7 +148,7 @@ chip8 :: proc(opcode: u16) {
 			}
 			v[x] = u8(sum)
 		case 0x0005:
-			//Set Vx = Vx - Vy, set VF = NOT borrow. 8xy5 
+			//Set Vx = Vx - Vy, set VF = NOT borrow.  
 			x := (opcode & 0x0f00) >> 8
 			y := (opcode & 0x00f0) >> 4
 
@@ -160,8 +160,16 @@ chip8 :: proc(opcode: u16) {
 
 			v[x] = u8(v[x] - v[y])
 		case 0x0006:
-		//Set Vx = Vx SHR 1.
+			//Set Vx = Vx SHR 1. 
+			x := (opcode & 0x0f00) >> 8
 
+			if v[x] & 0x1 == 1 {
+				v[15] = 1
+			} else {
+				v[15] = 0
+			}
+
+			v[x] = v[x] >> 1
 		case 0x0007:
 		//Set Vx = Vy - Vx, set VF = NOT borrow.
 
