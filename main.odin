@@ -196,7 +196,13 @@ chip8 :: proc(opcode: u16) {
 			v[x] = v[x] << 1
 		}
 	case 0x9000:
-		fmt.printfln("0x%04x", opcode)
+		//Skip next instruction if Vx != Vy.
+		x := (opcode & 0x0f00) >> 8
+		y := (opcode & 0x00F0) >> 4
+
+		if v[x] != v[y] {
+			pc = pc + 4
+		}
 	case 0xa000:
 		fmt.printfln("0x%04x", opcode)
 	case 0xb000:
