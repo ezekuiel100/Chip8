@@ -4,6 +4,8 @@ import "core:fmt"
 import "core:math/rand "
 import "core:os"
 
+
+memory: [4096]u8 = {}
 stack: [16]u16
 sp: u8 = 0
 pc: u16 // program counter , next address
@@ -38,6 +40,10 @@ main :: proc() {
 	if read_ok != nil {
 		fmt.println("Erro ao ler o arquivo:", read_ok)
 		return
+	}
+
+	for i := 0; i < len(data); i += 1 {
+		memory[0x200 + i] = data[i]
 	}
 
 	position := 0
