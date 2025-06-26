@@ -204,7 +204,9 @@ chip8 :: proc(opcode: u16) {
 			pc = pc + 4
 		}
 	case 0xa000:
-		fmt.printfln("0x%04x", opcode)
+		//Set I = nnn
+		nnn := opcode & 0x0fff
+		i = nnn
 	case 0xb000:
 		fmt.printfln("0x%04x", opcode)
 	case 0xc000:
