@@ -1,6 +1,7 @@
 package main
 
 import "core:fmt"
+import "core:math/rand "
 import "core:os"
 
 stack: [16]u16
@@ -47,6 +48,7 @@ main :: proc() {
 		chip8(opcode)
 		position = position + 2
 	}
+
 }
 
 
@@ -212,12 +214,19 @@ chip8 :: proc(opcode: u16) {
 		nnn := opcode & 0x0fff
 		pc = nnn + u16(v[0])
 	case 0xc000:
-		fmt.printfln("0x%04x", opcode)
+		//Set Vx = random byte AND kk. 
+		x := (opcode & 0x0f00) >> 8
+		kk := opcode & 0x00ff
+		random := u8(rand.uint32() % 256)
+
+		v[x] = random & u8(kk)
 	case 0xd000:
-		fmt.printfln("0x%04x", opcode)
+	//Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.
+
 	case 0xe000:
-		fmt.printfln("0x%04x", opcode)
+	//
 	case 0xf000:
-		fmt.printfln("0x%04x", opcode)
+	//
 	}
+
 }
