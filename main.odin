@@ -208,7 +208,9 @@ chip8 :: proc(opcode: u16) {
 		nnn := opcode & 0x0fff
 		i = nnn
 	case 0xb000:
-		fmt.printfln("0x%04x", opcode)
+		//Bnnn - JP V0, addr
+		nnn := opcode & 0x0fff
+		pc = nnn + u16(v[0])
 	case 0xc000:
 		fmt.printfln("0x%04x", opcode)
 	case 0xd000:
