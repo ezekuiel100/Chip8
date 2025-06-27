@@ -6,6 +6,8 @@ import "core:os"
 
 
 memory: [4096]u8 = {}
+screen: [64 * 32]bool
+
 stack: [16]u16
 sp: u8 = 0
 pc: u16 // program counter , next address
@@ -227,7 +229,49 @@ chip8 :: proc(opcode: u16) {
 
 		v[x] = random & u8(kk)
 	case 0xd000:
-	//Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.
+		//Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.
+		x := (opcode & 0x0F00) >> 8
+		y := (opcode & 0x00F0) >> 4
+		n := opcode & 0x000F
+
+		vx := v[x] % 64 // 64 é a largura da tela
+		vy := v[y] % 32 // 32 é a altura da tela
+
+		collision := false // Inicializa a colisão
+		for row: u16 = 0; row < n; row += 1 {
+			sprite_byte := memory[i + u16(row)]
+
+			for bit: u8 = 0; bit < 8; bit += 1 {
+				// Calcula a posição do pixel na tela
+				screen_x := (vx + bit) % 64
+				screen_y := (u16(vy) + row) % 32
+
+				// Pega o valor do bit do sprite (0 ou 1)
+				sprite_bit: bool = ((sprite_byte >> (7 - bit)) & 0x1) == 1
+
+				// Pega o valor do pixel da tela
+				screen_index := u32(screen_x) + u32(screen_y) * 64
+				screen_pixel := screen[screen_index]
+
+				// Verifica se vai ter colisão
+				if sprite_bit && screen_pixel {
+					collision = true
+				}
+
+				// Faz o XOR
+				new_pixel := sprite_bit ~ screen_pixel
+
+				// Atualiza a tela
+				screen[screen_index] = new_pixel
+			}
+		}
+
+		if collision {
+			v[15] = 1
+		} else {
+			v[15] = 0
+		}
+
 
 	case 0xe000:
 	//
