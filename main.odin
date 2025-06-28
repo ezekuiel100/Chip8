@@ -307,12 +307,14 @@ chip8 :: proc(opcode: u16) {
 
 
 	case 0xe000:
-		//
-		x := (opcode & 0x0f00) >> 8
-		vx := v[x]
+		switch opcode & 0x00ff {
+		case 0x009e:
+			x := (opcode & 0x0f00) >> 8
+			vx := v[x]
 
-		if keys[vx] {
-			pc += 2
+			if keys[vx] {
+				pc += 2
+			}
 		}
 
 	case 0xf000:
