@@ -12,7 +12,7 @@ screen: [64 * 32]bool
 
 stack: [16]u16
 sp: u8 = 0
-pc: u16 // program counter , next address
+pc: u16 = 0x200 // program counter , next address
 
 //Registers
 v: [16]u8
@@ -20,8 +20,33 @@ i: u16 // store memory address
 dt: u8 //delay timer 
 st: u8 //sound timer
 
+chip8_keymap := [16]raylib.KeyboardKey {
+	raylib.KeyboardKey.X, // 0
+	raylib.KeyboardKey.ONE, // 1
+	raylib.KeyboardKey.TWO, // 2
+	raylib.KeyboardKey.THREE, // 3
+	raylib.KeyboardKey.Q, // 4
+	raylib.KeyboardKey.W, // 5
+	raylib.KeyboardKey.E, // 6
+	raylib.KeyboardKey.A, // 7
+	raylib.KeyboardKey.S, // 8
+	raylib.KeyboardKey.D, // 9
+	raylib.KeyboardKey.Z, // A
+	raylib.KeyboardKey.C, // B
+	raylib.KeyboardKey.FOUR, // C
+	raylib.KeyboardKey.R, // D
+	raylib.KeyboardKey.F, // E
+	raylib.KeyboardKey.V, // F
+}
+
+keys: [16]bool
+
 
 main :: proc() {
+	raylib.SetTraceLogLevel(raylib.TraceLogLevel.ERROR)
+	raylib.InitWindow(640, 320, "CHIP-8 em Odin")
+	defer raylib.CloseWindow()
+
 	file, file_ok := os.open("MAZE")
 
 	if file_ok != nil {
@@ -51,63 +76,18 @@ main :: proc() {
 		memory[0x200 + i] = data[i]
 	}
 
-	position := 0
-	for position < len(data) {
-		value := data[position:position + 2]
-		opcode := u16(value[0]) << 8 | u16(value[1])
-
-		chip8(opcode)
-		position = position + 2
-	}
-
-}
-
-
-getKeyPressed :: proc() {
-	raylib.SetTraceLogLevel(raylib.TraceLogLevel.ERROR)
-	raylib.InitWindow(800, 600, "Tecla Pressionada em Odin")
-	defer raylib.CloseWindow()
-
-	keys := map[u16]string {
-		65 = "A",
-		66 = "B",
-		67 = "C",
-		68 = "D",
-		69 = "E",
-		70 = "F",
-		71 = "G",
-		72 = "H",
-		73 = "I",
-		74 = "J",
-		75 = "K",
-		76 = "L",
-		77 = "M",
-		78 = "N",
-		79 = "O",
-		80 = "P",
-		81 = "Q",
-		82 = "R",
-		83 = "S",
-		84 = "T",
-		85 = "U",
-		86 = "V",
-		87 = "W",
-		88 = "X",
-		89 = "Y",
-		90 = "Z",
-	}
-
 	for !raylib.WindowShouldClose() {
-		raylib.BeginDrawing()
-		raylib.ClearBackground(raylib.RAYWHITE)
-
-		keyPressed := raylib.GetKeyPressed()
-		value, ok := keys[u16(keyPressed)]
-
-		if ok {
-			fmt.println(value, ok)
+		for i in 0 ..< 16 {
+			keys[i] = raylib.IsKeyDown(chip8_keymap[i])
 		}
 
+		opcode := u16(memory[pc]) << 8 | u16(memory[pc + 1])
+
+		chip8(opcode)
+		pc = pc + 2
+
+		raylib.BeginDrawing()
+		raylib.ClearBackground(raylib.RAYWHITE)
 		raylib.EndDrawing()
 	}
 }
@@ -329,6 +309,11 @@ chip8 :: proc(opcode: u16) {
 	case 0xe000:
 		//
 		x := (opcode & 0x0f00) >> 8
+		vx := v[x]
+
+		if keys[vx] {
+			pc += 2
+		}
 
 	case 0xf000:
 	//
