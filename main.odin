@@ -1,9 +1,11 @@
+#+feature dynamic-literals
 package main
 
 import "core:fmt"
 import "core:math/rand "
 import "core:os"
-
+import "core:strconv"
+import "vendor:raylib"
 
 memory: [4096]u8 = {}
 screen: [64 * 32]bool
@@ -17,6 +19,7 @@ v: [16]u8
 i: u16 // store memory address
 dt: u8 //delay timer 
 st: u8 //sound timer
+
 
 main :: proc() {
 	file, file_ok := os.open("MAZE")
@@ -57,6 +60,56 @@ main :: proc() {
 		position = position + 2
 	}
 
+}
+
+
+getKeyPressed :: proc() {
+	raylib.SetTraceLogLevel(raylib.TraceLogLevel.ERROR)
+	raylib.InitWindow(800, 600, "Tecla Pressionada em Odin")
+	defer raylib.CloseWindow()
+
+	keys := map[u16]string {
+		65 = "A",
+		66 = "B",
+		67 = "C",
+		68 = "D",
+		69 = "E",
+		70 = "F",
+		71 = "G",
+		72 = "H",
+		73 = "I",
+		74 = "J",
+		75 = "K",
+		76 = "L",
+		77 = "M",
+		78 = "N",
+		79 = "O",
+		80 = "P",
+		81 = "Q",
+		82 = "R",
+		83 = "S",
+		84 = "T",
+		85 = "U",
+		86 = "V",
+		87 = "W",
+		88 = "X",
+		89 = "Y",
+		90 = "Z",
+	}
+
+	for !raylib.WindowShouldClose() {
+		raylib.BeginDrawing()
+		raylib.ClearBackground(raylib.RAYWHITE)
+
+		keyPressed := raylib.GetKeyPressed()
+		value, ok := keys[u16(keyPressed)]
+
+		if ok {
+			fmt.println(value, ok)
+		}
+
+		raylib.EndDrawing()
+	}
 }
 
 
@@ -274,7 +327,9 @@ chip8 :: proc(opcode: u16) {
 
 
 	case 0xe000:
-	//
+		//
+		x := (opcode & 0x0f00) >> 8
+
 	case 0xf000:
 	//
 	}
