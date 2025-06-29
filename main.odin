@@ -377,7 +377,12 @@ chip8 :: proc(opcode: u16) {
 			for a in 0 ..= x {
 				memory[i + u16(a)] = v[a]
 			}
-		case 0x0065: // Fx65 - LD Vx, [I]
+		case 0x0065:
+			// Fx65 - LD Vx, [I]
+			x := (opcode & 0x0f00) >> 8
+			for a in 0 ..= x {
+				v[a] = memory[i + u16(a)]
+			}
 		}
 	}
 
