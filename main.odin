@@ -360,7 +360,10 @@ chip8 :: proc(opcode: u16) {
 			// Fx1E - ADD I, Vx . Set I = I + Vx.
 			x := (opcode & 0x0f00) >> 8
 			i = u16(v[x]) + i
-		case 0x0029: // Fx29 - LD F, Vx
+		case 0x0029:
+			// Fx29 - LD F, Vx
+			x := (opcode & 0x0f00) >> 8
+			i = u16(v[x]) * 5
 		case 0x0033: // Fx33 - LD B, Vx
 		case 0x0055: // Fx55 - LD [I], Vx
 		case 0x0065: // Fx65 - LD Vx, [I]
