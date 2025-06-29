@@ -9,6 +9,7 @@ import "vendor:raylib"
 
 memory: [4096]u8 = {}
 screen: [64 * 32]bool
+delay_timer: u8
 
 stack: [16]u16
 sp: u8 = 0
@@ -326,7 +327,20 @@ chip8 :: proc(opcode: u16) {
 		}
 
 	case 0xf000:
-	//
+		switch opcode & 0x00FF {
+		case 0x0007:
+			// Fx07 - LD Vx, DT
+			x := (opcode & 0x0f00) >> 8
+			v[x] = delay_timer
+		case 0x000A: //
+		case 0x0015: //
+		case 0x0018: //
+		case 0x001E: //
+		case 0x0029: //
+		case 0x0033: //
+		case 0x0055: //
+		case 0x0065: //
+		}
 	}
 
 }
