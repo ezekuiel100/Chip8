@@ -348,7 +348,10 @@ chip8 :: proc(opcode: u16) {
 			if !key_pressed {
 				return
 			}
-		case 0x0015: //
+		case 0x0015:
+			// Fx15 - LD DT, Vx
+			x := (opcode & 0x0f00) >> 8
+			delay_timer = v[x]
 		case 0x0018: //
 		case 0x001E: //
 		case 0x0029: //
