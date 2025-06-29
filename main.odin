@@ -19,7 +19,7 @@ pc: u16 = 0x200 // program counter , next address
 v: [16]u8
 i: u16 // store memory address
 dt: u8 //delay timer 
-st: u8 //sound timer
+sound_timer: u8 //sound timer
 
 chip8_keymap := [16]raylib.KeyboardKey {
 	raylib.KeyboardKey.X, // 0
@@ -352,7 +352,10 @@ chip8 :: proc(opcode: u16) {
 			// Fx15 - LD DT, Vx
 			x := (opcode & 0x0f00) >> 8
 			delay_timer = v[x]
-		case 0x0018: //
+		case 0x0018:
+			//Fx18 - LD ST, Vx
+			x := (opcode & 0x0f00) >> 8
+			sound_timer = v[x]
 		case 0x001E: //
 		case 0x0029: //
 		case 0x0033: //
