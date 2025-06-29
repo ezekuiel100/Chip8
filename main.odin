@@ -364,7 +364,13 @@ chip8 :: proc(opcode: u16) {
 			// Fx29 - LD F, Vx
 			x := (opcode & 0x0f00) >> 8
 			i = u16(v[x]) * 5
-		case 0x0033: // Fx33 - LD B, Vx
+		case 0x0033:
+			// Fx33 - LD B, Vx
+			x := (opcode & 0x0f00) >> 8
+			value := v[x]
+			memory[i] = value / 100
+			memory[i + 1] = (value / 10) % 10
+			memory[i + 2] = value % 10
 		case 0x0055: // Fx55 - LD [I], Vx
 		case 0x0065: // Fx65 - LD Vx, [I]
 		}
