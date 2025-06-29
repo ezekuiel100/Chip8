@@ -329,10 +329,25 @@ chip8 :: proc(opcode: u16) {
 	case 0xf000:
 		switch opcode & 0x00FF {
 		case 0x0007:
-			// Fx07 - LD Vx, DT
+			// Fx07 - LD Vx, DT Set Vx = delay timer value.
 			x := (opcode & 0x0f00) >> 8
 			v[x] = delay_timer
-		case 0x000A: //
+		case 0x000A:
+			// Fx0A - LD Vx, K
+			x := (opcode & 0x0f00) >> 8
+
+			key_pressed := false
+			for i in 0 ..< 16 {
+				if keys[i] {
+					v[x] = u8(i)
+					key_pressed = true
+					break
+				}
+			}
+
+			if !key_pressed {
+				return
+			}
 		case 0x0015: //
 		case 0x0018: //
 		case 0x001E: //
