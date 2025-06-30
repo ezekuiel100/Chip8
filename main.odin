@@ -21,6 +21,11 @@ i: u16 // store memory address
 dt: u8 //delay timer 
 sound_timer: u8 //sound timer
 
+CHIP8_WIDTH :: 64
+CHIP8_HEIGHT :: 32
+PIXEL_SIZE :: 10
+
+
 chip8_keymap := [16]raylib.KeyboardKey {
 	raylib.KeyboardKey.X, // 0
 	raylib.KeyboardKey.ONE, // 1
@@ -46,6 +51,7 @@ keys: [16]bool
 main :: proc() {
 	raylib.SetTraceLogLevel(raylib.TraceLogLevel.ERROR)
 	raylib.InitWindow(640, 320, "CHIP-8 em Odin")
+	raylib.SetTargetFPS(60)
 	defer raylib.CloseWindow()
 
 	file, file_ok := os.open("MAZE")
@@ -56,6 +62,93 @@ main :: proc() {
 	}
 
 	defer os.close(file)
+
+	fontset: [80]u8 = {
+		0xF0,
+		0x90,
+		0x90,
+		0x90,
+		0xF0, // 0
+		0x20,
+		0x60,
+		0x20,
+		0x20,
+		0x70, // 1
+		0xF0,
+		0x10,
+		0xF0,
+		0x80,
+		0xF0, // 2
+		0xF0,
+		0x10,
+		0xF0,
+		0x10,
+		0xF0, // 3
+		0x90,
+		0x90,
+		0xF0,
+		0x10,
+		0x10, // 4
+		0xF0,
+		0x80,
+		0xF0,
+		0x10,
+		0xF0, // 5
+		0xF0,
+		0x80,
+		0xF0,
+		0x90,
+		0xF0, // 6
+		0xF0,
+		0x10,
+		0x20,
+		0x40,
+		0x40, // 7
+		0xF0,
+		0x90,
+		0xF0,
+		0x90,
+		0xF0, // 8
+		0xF0,
+		0x90,
+		0xF0,
+		0x10,
+		0xF0, // 9
+		0xF0,
+		0x90,
+		0xF0,
+		0x90,
+		0x90, // A
+		0xE0,
+		0x90,
+		0xE0,
+		0x90,
+		0xE0, // B
+		0xF0,
+		0x80,
+		0x80,
+		0x80,
+		0xF0, // C
+		0xE0,
+		0x90,
+		0x90,
+		0x90,
+		0xE0, // D
+		0xF0,
+		0x80,
+		0xF0,
+		0x80,
+		0xF0, // E
+		0xF0,
+		0x80,
+		0xF0,
+		0x80,
+		0x80, // F
+	}
+
+	for i in 0 ..< 80 {
+		memory[i] = fontset[i]
+	}
 
 	info, info_ok := os.stat("MAZE")
 	if info_ok != nil {
@@ -83,12 +176,26 @@ main :: proc() {
 		}
 
 		opcode := u16(memory[pc]) << 8 | u16(memory[pc + 1])
-
 		chip8(opcode)
-		pc = pc + 2
+
 
 		raylib.BeginDrawing()
 		raylib.ClearBackground(raylib.RAYWHITE)
+
+		for y in 0 ..< CHIP8_HEIGHT {
+			for x in 0 ..< CHIP8_WIDTH {
+				if screen[y * CHIP8_WIDTH + x] {
+					raylib.DrawRectangle(
+						i32(x * PIXEL_SIZE),
+						i32(y * PIXEL_SIZE),
+						PIXEL_SIZE,
+						PIXEL_SIZE,
+						raylib.BLACK,
+					)
+				}
+			}
+		}
+
 		raylib.EndDrawing()
 	}
 }
@@ -100,45 +207,48 @@ chip8 :: proc(opcode: u16) {
 		switch opcode & 0x0fff {
 		case 0x00e0:
 			//Clear the display
-			fmt.printfln("0x%04x", opcode)
+			for i in 0 ..< 64 * 32 {
+				screen[i] = false
+			}
 		case 0x00ee:
 			//RET
 			sp = sp - 1
 			ret_addr := stack[sp]
 			pc = ret_addr
+			return
 		}
 	case 0x1000:
 		//Jump to location nnn.
 		location := opcode & 0x0fff
 		pc = location
+		return
 	case 0x2000:
 		//Call subroutine at nnn.
 		location := opcode & 0x0fff
 		stack[sp] = pc
 		sp = sp + 1
 		pc = location
+		return
 	case 0x3000:
 		// Skip next instruction if Vx = kk.
 		x := (opcode & 0x0f00) >> 8
 		kk := opcode & 0x00ff
 		if v[x] == u8(kk) {
-			pc = pc + 4
+			pc = pc + 2
 		}
 	case 0x4000:
 		//Skip next instruction if Vx != kk.
 		x := (opcode & 0x0f00) >> 8
 		kk := opcode & 0x00ff
 		if v[x] != u8(kk) {
-			pc = pc + 4
+			pc = pc + 2
 		}
-
-		pc = pc + 2
 	case 0x5000:
 		//Skip next instruction if Vx = Vy.
 		x := (opcode & 0x0f00) >> 8
 		y := (opcode & 0x00f0) >> 4
 		if v[x] == v[y] {
-			pc = pc + 4
+			pc = pc + 2
 		}
 	case 0x6000:
 		//Set Vx = kk. Puts the value kk into register Vx.
@@ -245,7 +355,8 @@ chip8 :: proc(opcode: u16) {
 		y := (opcode & 0x00F0) >> 4
 
 		if v[x] != v[y] {
-			pc = pc + 4
+			pc = pc + 2
+			return
 		}
 	case 0xa000:
 		//Set I = nnn
@@ -255,6 +366,7 @@ chip8 :: proc(opcode: u16) {
 		//Bnnn - JP V0, addr
 		nnn := opcode & 0x0fff
 		pc = nnn + u16(v[0])
+		return
 	case 0xc000:
 		//Set Vx = random byte AND kk. 
 		x := (opcode & 0x0f00) >> 8
@@ -314,7 +426,8 @@ chip8 :: proc(opcode: u16) {
 			vx := v[x]
 
 			if keys[vx] {
-				pc += 2
+				pc = pc + 2
+				return
 			}
 
 		case 0x00a1:
@@ -322,7 +435,8 @@ chip8 :: proc(opcode: u16) {
 			vx := v[x]
 
 			if !keys[vx] {
-				pc += 2
+				pc = pc + 2
+				return
 			}
 		}
 
@@ -386,4 +500,5 @@ chip8 :: proc(opcode: u16) {
 		}
 	}
 
+	pc = pc + 2
 }
